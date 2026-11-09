@@ -137,6 +137,8 @@ Two more. Neither declares anything.
 
 `message_handler` is the catch-all: every server notification the session surfaces reaches it (as well as its specific callback), and on a stream-backed transport so does every transport-level `Exception`. Two never do: `notifications/cancelled` is applied by the SDK rather than surfaced, and a subscription acknowledgment for a live `listen()` stream is consumed by that stream. Annotate the parameter with `IncomingMessage` (`ServerNotification | Exception`, exported from `mcp.client`). The one pattern worth knowing is `if isinstance(message, Exception): raise message`, so a broken connection fails loudly instead of vanishing.
 
+On a 2026-07-28 connection, `message_handler` alone won't see catalog changes: the `list_changed` notifications for tools, prompts, and resources (and `resources/updated`) arrive only once you open a `subscriptions/listen` stream with `client.listen(...)`. While that stream is open, they reach both the stream and `message_handler`. See **[Subscriptions](subscriptions.md)**.
+
 ## Recap
 
 * A server can send requests to the client. You answer them with callbacks passed to `Client(...)`.
